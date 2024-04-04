@@ -1,0 +1,7 @@
+.aws-sam
+runs
+venv
+*.pt
+*.pyc
+*.onnx
+_*.py

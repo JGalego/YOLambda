@@ -1,0 +1,6 @@
+awscurl
+boto3
+netron
+onnxsim
+onnxoptimizer
+ultralytics

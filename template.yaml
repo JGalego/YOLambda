@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Scaling YOLOv8 inference with Serverless:
+  How to build an object detection app using AWS Lambda and AWS SAM
+
+Resources:
+  YOLOModel:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: yolo-models
+      Description: YOLO models
+      ContentUri: models/
+      CompatibleRuntimes:
+        - python3.9
+        - python3.10
+        - python3.11
+  YOLOFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Layers:
+        - !Ref YOLOModel
+      Handler: app.handler
+      Runtime: python3.10
+      MemorySize: 10240
+      Timeout: 60
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+
+Outputs:
+  YOLOV8FunctionUrlEndpoint:
+      Description: "YOLO Lambda function URL"
+      Value:
+        Fn::GetAtt: YOLOFunctionUrl.FunctionUrl

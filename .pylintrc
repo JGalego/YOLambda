@@ -1,0 +1,4 @@
+[BASIC]
+
+# Just ignore every x*, y* and d*
+good-names-rgxs=^[_a-z][_a-z0-9]?$
