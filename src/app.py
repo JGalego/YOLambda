@@ -17,7 +17,7 @@ logger.setLevel(logging.INFO)
 
 # Load YOLO model
 logger.info("Loading model")
-model = YOLONNX("/opt/yolov9c.onnx")
+model = YOLONNX("/opt/yolov8n.onnx")
 
 def handler(
         event,

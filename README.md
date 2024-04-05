@@ -1,8 +1,8 @@
-# YOLambda: Scaling YOLOv9 inference with Serverless
+# YOLambda: Scaling YOLO inference with Serverless
 
 ## Overview
 
-Learn how to run inference at scale with [YOLOv9](https://github.com/ultralytics/ultralytics) in a secure and reliable way with [AWS Lambda](https://aws.amazon.com/lambda/) and [AWS SAM](https://aws.amazon.com/serverless/sam/).
+Learn how to run inference at scale with [YOLOv8/9](https://github.com/ultralytics/ultralytics) in a secure and reliable way with [AWS Lambda](https://aws.amazon.com/lambda/) and [AWS SAM](https://aws.amazon.com/serverless/sam/).
 
 <p>
 	<img src="images/example.jpg" width="30%"/>
@@ -25,19 +25,19 @@ Learn how to run inference at scale with [YOLOv9](https://github.com/ultralytics
 	pip install -qr requirements.txt
 	```
 
-1. Convert YOLOv9 model to ONNX
+1. Convert YOLOv8 model to ONNX
 
 	```bash
 	# Export PT -> ONNX
-	yolo mode=export model=yolov9c.pt format=onnx dynamic=True
+	yolo mode=export model=yolov8n.pt format=onnx dynamic=True
 
 	# (Optional) Simplify
 	# https://github.com/daquexian/onnx-simplifier
-	onnxsim yolov9c.onnx yolov9c.onnx
+	onnxsim yolov8n.onnx yolov8n.onnx
 
 	# (Optional) Optimize
 	# https://github.com/onnx/optimizer
-	python -m onnxoptimizer yolov9c.onnx yolov9c.onnx
+	python -m onnxoptimizer yolov8n.onnx yolov8n.onnx
 
 	# (Optional) Visualize
 
@@ -46,7 +46,7 @@ Learn how to run inference at scale with [YOLOv9](https://github.com/ultralytics
 
 	# 💻 CLI
 	# https://github.com/lutzroeder/netron
-	netron -b yolov9c.onnx
+	netron -b yolov8n.onnx
 
 	# Move it to the models folder
 	mkdir models; mv yolov8n.onnx $_
