@@ -1,5 +1,5 @@
 """
-Tests YOLOv8 Lambda function URL
+Tests YOLOv9 Lambda function URL
 
 References:
 + Announcing AWS Lambda Function URLs: Built-in HTTPS Endpoints for Single-Function Microservices
