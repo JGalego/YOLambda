@@ -49,7 +49,7 @@ Learn how to run inference at scale with [YOLOv8](https://github.com/ultralytics
 	netron -b yolov8n.onnx
 
 	# Move it to the models folder
-	mkdir --parents ./models/; mv yolov8n.onnx $_
+	mkdir models; mv yolov8n.onnx $_
 	```
 
 2. Build and deploy the application
