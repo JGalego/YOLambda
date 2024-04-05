@@ -29,15 +29,15 @@ Learn how to run inference at scale with [YOLOv8/9](https://github.com/ultralyti
 
 	```bash
 	# Export PT -> ONNX
-	yolo mode=export model=yolov8n.pt format=onnx dynamic=True
+	yolo mode=export model=yolov9c.pt format=onnx dynamic=True
 
 	# (Optional) Simplify
 	# https://github.com/daquexian/onnx-simplifier
-	onnxsim yolov8n.onnx yolov8n.onnx
+	onnxsim yolov9c.onnx yolov9c.onnx
 
 	# (Optional) Optimize
 	# https://github.com/onnx/optimizer
-	python -m onnxoptimizer yolov8n.onnx yolov8n.onnx
+	python -m onnxoptimizer yolov9c.onnx yolov9c.onnx
 
 	# (Optional) Visualize
 
@@ -46,10 +46,10 @@ Learn how to run inference at scale with [YOLOv8/9](https://github.com/ultralyti
 
 	# 💻 CLI
 	# https://github.com/lutzroeder/netron
-	netron -b yolov8n.onnx
+	netron -b yolov9c.onnx
 
 	# Move it to the models folder
-	mkdir models; mv yolov8n.onnx $_
+	mkdir models; mv yolov9c.onnx $_
 	```
 
 2. Build and deploy the application
