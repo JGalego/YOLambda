@@ -2,7 +2,7 @@
 
 ## Overview
 
-Learn how to run inference at scale with [YOLOv8](https://github.com/ultralytics/ultralytics) in a secure and reliable way with [AWS Lambda](https://aws.amazon.com/lambda/), [Amazon API Gateway](https://aws.amazon.com/api-gateway/) and [AWS SAM](https://aws.amazon.com/serverless/sam/).
+Learn how to run inference at scale with [YOLOv8](https://github.com/ultralytics/ultralytics) in a secure and reliable way with [AWS Lambda](https://aws.amazon.com/lambda/) and [AWS SAM](https://aws.amazon.com/serverless/sam/).
 
 <p>
 	<img src="images/example.jpg" width="30%"/>
@@ -41,10 +41,10 @@ Learn how to run inference at scale with [YOLOv8](https://github.com/ultralytics
 
 	# (Optional) Visualize
 
-	# > Browser
+	# 🌐 Browser
 	# Visit https://netron.app/
 
-	# > CLI
+	# 💻 CLI
 	# https://github.com/lutzroeder/netron
 	netron -b yolov8n.onnx
 
@@ -55,13 +55,13 @@ Learn how to run inference at scale with [YOLOv8](https://github.com/ultralytics
 2. Build and deploy the application
 
 	```bash
-	# Build
+	# 🏗️ Build
 	sam build --use-container
 
-	# Deploy
+	# 🚀 Deploy
 	sam deploy --guided
 
-	# Don't forget to note down the function URL
+	# ❗ Don't forget to note down the function URL
 	export YOLAMBDA_URL=$(sam list stack-outputs --stack-name yolambda --output json | jq -r .[0].OutputValue)
 	```
 
