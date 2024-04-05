@@ -25,7 +25,7 @@ Learn how to run inference at scale with [YOLOv8/9](https://github.com/ultralyti
 	pip install -qr requirements.txt
 	```
 
-1. Convert YOLOv8 model to ONNX
+1. Convert YOLOv9 model to ONNX
 
 	```bash
 	# Export PT -> ONNX
