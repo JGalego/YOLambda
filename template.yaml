@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Scaling YOLOv8 inference with Serverless:
+  Scaling YOLO inference with Serverless:
   How to build an object detection app using AWS Lambda and AWS SAM
 
 Resources:
@@ -29,7 +29,7 @@ Resources:
         AuthType: AWS_IAM
 
 Outputs:
-  YOLOV8FunctionUrlEndpoint:
+  YOLOFunctionUrlEndpoint:
       Description: "YOLO Lambda function URL"
       Value:
         Fn::GetAtt: YOLOFunctionUrl.FunctionUrl
