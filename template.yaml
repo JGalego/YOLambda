@@ -1,8 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Scaling YOLO inference with Serverless:
+  Scaling YOLO Inference with Serverless:
   How to build an object detection app using AWS Lambda and AWS SAM
+  Supports any YOLO version (YOLOv5, v8, v9, v10, v11, and future versions)
+
+Parameters:
+  YoloModelPath:
+    Type: String
+    Default: '/opt/yolo.onnx'
+    Description: Path to the YOLO model file in the Lambda layer
 
 Resources:
   YOLOModel:
@@ -25,6 +32,9 @@ Resources:
       Runtime: python3.10
       MemorySize: 10240
       Timeout: 60
+      Environment:
+        Variables:
+          YOLO_MODEL_PATH: !Ref YoloModelPath
       FunctionUrlConfig:
         AuthType: AWS_IAM
 
