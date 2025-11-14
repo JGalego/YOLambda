@@ -2,7 +2,7 @@
 
 ## Overview
 
-Learn how to run inference at scale with [YOLOv8/9](https://github.com/ultralytics/ultralytics) in a secure and reliable way with [AWS Lambda](https://aws.amazon.com/lambda/) and [AWS SAM](https://aws.amazon.com/serverless/sam/).
+Learn how to run inference at scale with [YOLOv8/9/11](https://github.com/ultralytics/ultralytics) in a secure and reliable way with [AWS Lambda](https://aws.amazon.com/lambda/) and [AWS SAM](https://aws.amazon.com/serverless/sam/).
 
 <p>
 	<img src="images/example.jpg" width="30%"/>
@@ -29,15 +29,14 @@ Learn how to run inference at scale with [YOLOv8/9](https://github.com/ultralyti
 
 	```bash
 	# Export PT -> ONNX
-	yolo mode=export model=yolov9c.pt format=onnx dynamic=True
+	yolo mode=export model=yolov11n.pt format=onnx dynamic=True
 
 	# (Optional) Simplify
 	# https://github.com/daquexian/onnx-simplifier
-	onnxsim yolov9c.onnx yolov9c.onnx
-
+	onnxsim yolov11n.onnx yolov11n.onnx
 	# (Optional) Optimize
 	# https://github.com/onnx/optimizer
-	python -m onnxoptimizer yolov9c.onnx yolov9c.onnx
+	python -m onnxoptimizer yolov11n.onnx yolov11n.onnx
 
 	# (Optional) Visualize
 
@@ -46,10 +45,10 @@ Learn how to run inference at scale with [YOLOv8/9](https://github.com/ultralyti
 
 	# 💻 CLI
 	# https://github.com/lutzroeder/netron
-	netron -b yolov9c.onnx
+	netron -b yolov11n.onnx
 
 	# Move it to the models folder
-	mkdir models; mv yolov9c.onnx $_
+	mkdir models; mv yolov11n.onnx $_
 	```
 
 2. Build and deploy the application
@@ -103,26 +102,3 @@ Learn how to run inference at scale with [YOLOv8/9](https://github.com/ultralyti
 	```bash
 	python test/test.py $YOLAMBDA_URL images/example.jpg
 	```
-
-<!--
-## TODO
-
-* Build a Streamlit application around this
-
-* Run Lambda functions on the AWS IoT Greengrass core (v1? v2?)
-https://aws.amazon.com/blogs/aws/aws-greengrass-run-aws-lambda-functions-on-connected-devices/
-https://docs.aws.amazon.com/greengrass/v1/developerguide/lambda-functions.html
-https://docs.aws.amazon.com/greengrass/v2/developerguide/greengrass-v1-concept-differences.html
-
-	Issues with the GG service role:
-	> GreenGrass is not authorized to assume the Service Role
-	https://repost.aws/questions/QUrO84DbX-QLe8I2fiLKEshg/greengrass-is-not-authorized-to-assume-the-service-role
-	https://docs.aws.amazon.com/greengrass/v1/developerguide/security_iam_troubleshoot.html
-	https://docs.aws.amazon.com/greengrass/v1/developerguide/service-role.html
-
-	NMCLI to manage wifi connection
-	https://www.makeuseof.com/connect-to-wifi-with-nmcli/
-
-* Test with Serverless
-https://www.serverless.com/framework/docs/providers/aws/guide/functions
--->
