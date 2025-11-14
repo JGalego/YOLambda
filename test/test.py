@@ -1,5 +1,7 @@
 """
-Tests YOLOv8 Lambda function URL
+Tests YOLO Lambda function URL (Version-Agnostic)
+
+Supports any YOLO version: YOLOv5, YOLOv8, YOLOv9, YOLOv10, YOLOv11, and future versions
 
 References:
 + Announcing AWS Lambda Function URLs: Built-in HTTPS Endpoints for Single-Function Microservices

@@ -5,19 +5,21 @@ YOLambda - YOLONNX on Lambda
 import base64
 import json
 import logging
+import os
 
 from io import BytesIO
 from PIL import Image
 
-from yolonnx import YOLONNX
+from yolonnx import YOLODetector
 
 # Initialize logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # Load YOLO model
-logger.info("Loading model")
-model = YOLONNX("/opt/yolov8n.onnx")
+model_path = os.environ.get('YOLO_MODEL_PATH', '/opt/yolo.onnx')
+logger.info("Loading model from %s", model_path)
+model = YOLODetector(model_path)
 
 def handler(
         event,

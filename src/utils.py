@@ -1,5 +1,8 @@
 """
-YOLONNX utilities
+YOLO Detector Utilities
+
+Utilities for YOLO inference that work with any YOLO version:
+YOLOv5, YOLOv8, YOLOv9, YOLOv10, YOLOv11, and future versions
 """
 
 import numpy as np
@@ -83,7 +86,8 @@ def nms(
     """
 
     # Checks
-    assert 0 <= iou_thres <= 1, f"Invalid IoU threshold {iou_thres}, valid values are between 0.0 and 1.0"
+    assert 0 <= iou_thres <= 1, \
+        f"Invalid IoU threshold {iou_thres}, valid values are between 0.0 and 1.0"
 
     # Extract the coordinates of every prediction box
     x1 = boxes[:, 0]
@@ -165,9 +169,10 @@ def class_nms(
     Returns:
         A list of filtered boxes, Shape: [ , 4]
     """
-    
-	# Checks
-    assert 0 <= iou_thres <= 1, f"Invalid IoU threshold {iou_thres}, valid values are between 0.0 and 1.0"
+
+    # Checks
+    assert 0 <= iou_thres <= 1, \
+        f"Invalid IoU threshold {iou_thres}, valid values are between 0.0 and 1.0"
 
     # Get a list of unique classes
     unique_cls_ids = np.unique(cls_ids)
@@ -230,44 +235,92 @@ def process_output(
         out: np.ndarray,
         orig_shape: tuple[int],
         scaled_shape: tuple[int],
-        conf_thres: float = 0.7,
-        iou_thres: float = 0.5
+        conf_thres: float = 0.3,
+        iou_thres: float = 0.3
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Processes YOLO's output.
 
+    This function handles different YOLO output formats:
+    - YOLOv5/v8/v9/v11: Standard format with shape (1, N, 85) or (1, N, 84+classes)
+    - YOLOv10: May have different output format
+
     Args:
         out: (np.ndarray) The output from YOLO
+        orig_shape: (tuple) Original image shape (width, height)
+        scaled_shape: (tuple) Scaled image shape (width, height) 
         conf_thres: (float) The confidence score threshold
         iou_thres: (float) The IoU threshold
     Returns:
         A tuple containing arrays of bounding boxes, confidence scores and class IDs
     """
-    # Get predictions from output
-    preds = np.squeeze(out[0]).T
+    # Get predictions from output - handle different output shapes
+    preds = np.squeeze(out[0])
 
-    # Filter out low-confidence predictions
-    confs = np.max(preds[:, 4:], axis=1)
+    # Handle different output orientations
+    if preds.ndim == 2:
+        if preds.shape[0] > preds.shape[1]:
+            # Shape is (N, features) - transpose to (features, N) then back
+            preds = preds.T
+        else:
+            # Shape is already (features, N) - transpose to (N, features)
+            preds = preds.T
+
+    # Ensure we have enough columns
+    if preds.shape[1] < 4:
+        raise ValueError(
+            f"Unexpected YOLO output format. Expected at least 4 columns, got {preds.shape[1]}"
+        )
+
+    # Extract box coordinates
+    boxes = preds[:, :4]  # x, y, w, h
+
+    # Handle different YOLO formats
+    if preds.shape[1] == 4:
+        # Only box coordinates (rare case)
+        confs = np.ones(preds.shape[0])
+        cls_ids = np.zeros(preds.shape[0], dtype=int)
+    elif preds.shape[1] == 5:
+        # Format: [x, y, w, h, conf] (single class or objectness only)
+        confs = preds[:, 4]
+        cls_ids = np.zeros(preds.shape[0], dtype=int)
+    elif preds.shape[1] == 84:
+        # YOLOv11 format: [x, y, w, h, class1, class2, ..., class80] (no objectness)
+        class_scores = preds[:, 4:]  # 80 class scores
+        confs = np.max(class_scores, axis=1)
+        cls_ids = np.argmax(class_scores, axis=1)
+    elif preds.shape[1] == 85:
+        # YOLOv5/v8 format: [x, y, w, h, obj_conf, class1, class2, ..., class80]
+        obj_confs = preds[:, 4]  # objectness confidence
+        class_scores = preds[:, 5:]  # 80 class scores
+        confs = obj_confs * np.max(class_scores, axis=1)  # combined confidence
+        cls_ids = np.argmax(class_scores, axis=1)
+    else:
+        # Generic multi-class format - try to determine structure
+        class_scores = preds[:, 4:]
+        confs = np.max(class_scores, axis=1)
+        cls_ids = np.argmax(class_scores, axis=1)
+
+    # Filter by confidence threshold
     keep = confs > conf_thres
-    preds = preds[keep, :]
+    if not np.any(keep):
+        return np.array([]), np.array([]), np.array([])
 
-    # Get prediction boxes
-    boxes = preds[:, :4]
+    boxes = boxes[keep]
+    confs = confs[keep]
+    cls_ids = cls_ids[keep]
+
+    # Convert boxes from xywh to xyxy format
     boxes = xywh2xyxy(boxes)
 
-	# Scale boxes
+    # Scale boxes back to original image size
     boxes = scale_boxes(orig_shape, boxes, scaled_shape)
 
-    # Get confidence scores
-    confs = np.max(preds[:, 4:], axis=1)
-
-    # Get class IDs
-    cls_ids = np.argmax(preds[:, 4:], axis=1)
-
-    # Perform NMS
-    idxs = class_nms(boxes, confs, cls_ids, iou_thres=iou_thres)
-
-    return boxes[idxs], confs[idxs], cls_ids[idxs]
+    # Perform Non-Maximum Suppression
+    if len(boxes) > 0:
+        idxs = class_nms(boxes, confs, cls_ids, iou_thres=iou_thres)
+        return boxes[idxs], confs[idxs], cls_ids[idxs]
+    return np.array([]), np.array([]), np.array([])
 
 
 def parse_detections(
@@ -275,7 +328,7 @@ def parse_detections(
         confs: np.ndarray,
         cls_ids: np.ndarray,
         meta: dict = None
-    ) -> dict:
+    ) -> list:
     """
     Generates YOLO's predictions in a human-readable format.
 

@@ -10,17 +10,26 @@ from utils import (
     parse_detections
 )
 
-class YOLONNX:
+class YOLODetector:
     """
-    YOLONN Class
+    YOLO Detector for ONNX models.
+
+    Supports YOLOv5, YOLOv8, YOLOv9, YOLOv10, YOLOv11 and future versions
     """
-    def __init__(self, model):
-        self.sess = InferenceSession(model)
+    def __init__(self, model_path):
+        self.sess = InferenceSession(model_path)
         self.meta = self.sess.get_modelmeta().custom_metadata_map
+
+        # Get input and output names dynamically
+        self.input_name = self.sess.get_inputs()[0].name
+        self.output_name = self.sess.get_outputs()[0].name
 
     def __repr__(self):
         meta = "\n".join([f"\t{prop}: {val}" for prop, val in self.meta.items()])
-        return f"<YOLONNX \n{meta}\n>"
+        return f"<YOLODetector\n" \
+               f"\tInput: {self.input_name}\n" \
+               f"\tOutput: {self.output_name}\n" \
+               f"{meta}\n>"
 
     def __call__(self, img, imgsz=640, conf_thres=0.3, iou_thres=0.5):
         # Prepare input
@@ -45,9 +54,12 @@ class YOLONNX:
         """
         Runs YOLO inference on a prepared image.
         
+        Dynamically handles different YOLO versions by using the actual
+        input/output names from the model rather than hardcoded values.
+        
         Args:
             inp: (np.ndarray) The input tensor
         Returns:
             The inference results
         """
-        return self.sess.run(['output0'], {'images': inp})
+        return self.sess.run([self.output_name], {self.input_name: inp})
